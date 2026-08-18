@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>LAOFE — ຈອງຄິວ</title>
+<meta name="theme-color" content="#4A1020">
+<link rel="stylesheet" href="theme.css">
+<style>
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="mark" id="logo">
+      <div class="wordmark"><b>LAO<i>FE</i></b><span>CAFE &amp; BEER</span></div>
+    </div>
+    <h1>LAO<em>FE</em></h1>
+    <div class="sub">CAFE &amp; BEER</div>
+  </div>
+
+  <!-- ============ ໜ້າຈອງຄິວ ============ -->
+  <div id="viewBook" class="card">
+    <h2>ຈອງຄິວ</h2>
+    <label for="name">ຊື່</label>
+    <input id="name" type="text" placeholder="ຊື່ຂອງທ່ານ" autocomplete="name">
+
+    <label for="phone">ເບີໂທ</label>
+    <input id="phone" type="tel" inputmode="numeric" placeholder="020 xxxx xxxx" autocomplete="tel">
+
+    <label>ຈຳນວນຄົນ</label>
+    <div class="stepper">
+      <button type="button" id="minus" aria-label="ຫຼຸດ">−</button>
+      <div class="val" id="peopleVal">1</div>
+      <button type="button" id="plus" aria-label="ເພີ່ມ">+</button>
+    </div>
+
+    <button class="btn" id="bookBtn">ຈອງຄິວ</button>
+    <div class="err" id="bookErr"></div>
+    <div class="notice">ຈອງແລ້ວຈະໄດ້ເລກຄິວ ແລະ ໜ້ານີ້ຈະແຈ້ງເຕືອນເມື່ອຮອດຄິວ</div>
+  </div>
+
+  <!-- ============ ໜ້າຄິວຂອງລູກຄ້າ ============ -->
+  <div id="viewTicket" class="card hide">
+    <div class="ticket">
+      <div class="label">ຄິວຂອງທ່ານ</div>
+      <div class="ring" id="ring">
+        <div class="track" id="ringTrack"></div>
+        <div class="inner">
+          <div class="big" id="myTicket">—</div>
+          <div class="cap" id="ringCap">ກຳລັງໂຫຼດ…</div>
+        </div>
+      </div>
+      <div id="statusPill"><span class="pill wait">ກຳລັງລໍຖ້າ</span></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="n" id="nowServing">—</div><div class="t">ກຳລັງຮັບໃຊ້</div></div>
+      <div class="stat"><div class="n" id="ahead">—</div><div class="t">ຄິວກ່ອນໜ້າ</div></div>
+      <div class="stat"><div class="n" id="estWait">—</div><div class="t">ລໍຖ້າ (ນາທີ)</div></div>
+    </div>
+
+    <div id="turnBanner" class="hide" style="margin-top:16px;text-align:center">
+      <span class="pill turn" style="font-size:16px;padding:10px 20px">🔔 ຮອດຄິວທ່ານແລ້ວ! ເຊີນຮັບບໍລິການ</span>
+    </div>
+
+    <button class="btn" id="soundBtn" style="margin-top:16px">🔔 ເປີດສຽງແຈ້ງເຕືອນ</button>
+
+    <div class="qrbox">
+      <div id="qr"></div>
+      <div class="hint">ສະແກນ / ບັນທຶກໜ້ານີ້ ເພື່ອເປີດເບິ່ງຄິວຄືນພາຍຫຼັງ</div>
+    </div>
+
+    <button class="btn ghost" id="cancelBtn" style="margin-top:16px">ຍົກເລີກຄິວ</button>
+    <div class="err" id="tErr"></div>
+    <div class="notice" id="tNotice">ອັບເດດອັດຕະໂນມັດທຸກໆ 5 ວິນາທີ</div>
+  </div>
+
+  <div class="footer">LAOFE Cafe &amp; Beer · ລະບົບຈອງຄິວ</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@04f46c6a/qrcode.min.js"></script>
+<script src="config.js"></script>
+<script src="api.js"></script>
+<script src="alert.js"></script>
+<script>
+(function(){
+  var C = window.LAOFE_CONFIG || {};
+  var POLL = C.POLL_MS || 5000;
+  var els = function(id){return document.getElementById(id);};
+  var storeKey = 'laofe_ticket';
+
+  // ---- logo fallback: ຖ້າມີ logo.png ໃຫ້ໃຊ້ຮູບ ----
+  (function(){
+    var img = new Image();
+    img.onload = function(){
+      var m = els('logo'); m.innerHTML=''; m.appendChild(img);
+    };
+    img.onerror = function(){}; // ໃຊ້ wordmark ຕໍ່ໄປ
+    img.src = 'logo.png';
+    img.alt = 'LAOFE';
+  })();
+
+  // ---- stepper ----
+  var people = 1;
+  function renderPeople(){ els('peopleVal').textContent = people; }
+  els('minus').onclick=function(){ if(people>1){people--;renderPeople();} };
+  els('plus').onclick =function(){ if(people<30){people++;renderPeople();} };
+
+  function showErr(id,msg){ var e=els(id); e.textContent=msg; e.style.display='block'; }
+  function hideErr(id){ els(id).style.display='none'; }
+
+  // ---- ຈອງຄິວ ----
+  els('bookBtn').onclick = async function(){
+    hideErr('bookErr');
+    var name = els('name').value.trim();
+    var phone = els('phone').value.trim();
+    if(!name){ showErr('bookErr','ກະລຸນາໃສ່ຊື່'); return; }
+    if(!phone || phone.replace(/\D/g,'').length < 6){ showErr('bookErr','ກະລຸນາໃສ່ເບີໂທໃຫ້ຖືກຕ້ອງ'); return; }
+
+    var btn=this; btn.disabled=true; var old=btn.innerHTML; btn.innerHTML='<span class="spin"></span> ກຳລັງຈອງ...';
+    // priming ສຽງ (iOS ຕ້ອງການ user gesture)
+    try{ LAOFE_ALERT.prime(); }catch(e){}
+    try{
+      var r = await LAOFE_API.book(name, phone, people);
+      if(!r || !r.ok){ throw new Error((r&&r.error)||'ຈອງບໍ່ສຳເລັດ'); }
+      saveTicket(r.ticket);
+      soundOn = true;
+      showTicket(r);
+    }catch(err){
+      showErr('bookErr','ຜິດພາດ: '+err.message+' — ກວດການເຊື່ອມຕໍ່ ຫຼື config.js');
+    }finally{
+      btn.disabled=false; btn.innerHTML=old;
+    }
+  };
+
+  // ---- ບັນທຶກ ticket ຂອງມື້ນີ້ ----
+  function saveTicket(t){
+    var today = new Date().toISOString().slice(0,10);
+    try{ localStorage.setItem(storeKey, JSON.stringify({ticket:t,date:today})); }catch(e){}
+  }
+  function loadTicket(){
+    var today = new Date().toISOString().slice(0,10);
+    // ຈາກ URL ?ticket=
+    var u = new URLSearchParams(location.search).get('ticket');
+    if(u) return u;
+    try{
+      var s = JSON.parse(localStorage.getItem(storeKey)||'null');
+      if(s && s.date===today) return s.ticket;
+    }catch(e){}
+    return null;
+  }
+  function clearTicket(){ try{ localStorage.removeItem(storeKey); }catch(e){} }
+
+  var myTicket=null, soundOn=false, timer=null, lastServing=null, alerted=false, lastRecall=null;
+
+  function showTicket(initial){
+    myTicket = initial.ticket;
+    els('viewBook').classList.add('hide');
+    els('viewTicket').classList.remove('hide');
+    els('myTicket').textContent = myTicket;
+    renderStatus(initial);
+    makeQR();
+    poll(); // ເລີ່ມ loop
+  }
+
+  function makeQR(){
+    var box=els('qr'); box.innerHTML='';
+    var link = location.origin + location.pathname + '?ticket=' + encodeURIComponent(myTicket);
+    try{
+      new QRCode(box,{text:link,width:150,height:150,colorDark:'#4A1020',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    }catch(e){ box.textContent = link; }
+  }
+
+  function renderStatus(r){
+    if(r.nowServing) els('nowServing').textContent = r.nowServing; else els('nowServing').textContent='—';
+    els('ahead').textContent = (r.ahead==null? '—' : r.ahead);
+    els('estWait').textContent = (r.estMinutes==null? '—' : (r.estMinutes===0? '~0' : '~'+r.estMinutes));
+
+    // ---- ວົງແຫວນຄວາມຄືບໜ້າ ----
+    (function(){
+      var ring=els('ring'), track=els('ringTrack'), cap=els('ringCap');
+      if(!ring) return;
+      var myN = parseInt(String(myTicket).replace(/\D/g,''),10)||0;
+      var svN = parseInt(String(r.nowServing||'').replace(/\D/g,''),10)||0;
+      var pct = (myN>0) ? Math.max(0, Math.min(1, svN/myN)) : 0;
+      if(r.isMyTurn){ ring.classList.add('turn'); cap.textContent='ຮອດຄິວແລ້ວ'; }
+      else{
+        ring.classList.remove('turn');
+        track.style.setProperty('--pct', (pct*360)+'deg');
+        cap.textContent = (r.ahead==null? '' : (r.ahead===0? 'ທ່ານແມ່ນຄິວຕໍ່ໄປ' : 'ອີກ '+r.ahead+' ຄິວ'));
+      }
+    })();
+
+    var pill = els('statusPill'); var banner = els('turnBanner'); var card = els('viewTicket');
+    var st = r.myStatus;
+    banner.classList.add('hide'); card.classList.remove('flashing');
+
+    if(st==='cancelled'){ pill.innerHTML='<span class="pill cancel">ຍົກເລີກແລ້ວ</span>'; stop(); return; }
+    if(st==='done' || st==='closed'){ pill.innerHTML='<span class="pill done">ຮັບບໍລິການແລ້ວ ຂອບໃຈ 🙏</span>'; stop(); return; }
+    if(st==='skipped'){ pill.innerHTML='<span class="pill cancel">ຄິວຖືກຂ້າມ ກະລຸນາຕິດຕໍ່ພະນັກງານ</span>'; return; }
+    if(st==='notfound'){ pill.innerHTML='<span class="pill done">ບໍ່ພົບຄິວນີ້</span>'; return; }
+
+    if(r.isMyTurn){
+      pill.innerHTML='<span class="pill turn">ຮອດຄິວແລ້ວ</span>';
+      banner.classList.remove('hide');
+      card.classList.add('flashing');
+      if(soundOn && !alerted){ LAOFE_ALERT.ring(myTicket); alerted=true; }
+    }else{
+      pill.innerHTML='<span class="pill wait">ກຳລັງລໍຖ້າ · ຄິວກ່ອນໜ້າ '+(r.ahead==null?'—':r.ahead)+'</span>';
+      alerted=false;
+      // ໃກ້ຮອດ (ເຫຼືອ 1) → ເຕືອນເບົາ
+      if(soundOn && r.ahead===1 && lastServing!==r.nowServing){ LAOFE_ALERT.soft(); }
+    }
+    lastServing = r.nowServing;
+
+    // ຮຽກຊ້ຳຈາກ admin
+    if(r.recallStamp && r.recallStamp!==lastRecall && r.isMyTurn){
+      if(soundOn) LAOFE_ALERT.ring(myTicket);
+    }
+    lastRecall = r.recallStamp;
+  }
+
+  async function poll(){
+    try{
+      var r = await LAOFE_API.status(myTicket);
+      if(r && r.ok){ hideErr('tErr'); renderStatus(r); }
+    }catch(e){ showErr('tErr','ຂໍ້ຂ້ອງ: ກຳລັງລອງໃໝ່...'); }
+    timer = setTimeout(poll, POLL);
+  }
+  function stop(){ if(timer){ clearTimeout(timer); timer=null; } }
+
+  els('soundBtn').onclick=function(){
+    LAOFE_ALERT.prime(); LAOFE_ALERT.soft(); soundOn=true;
+    this.textContent='🔔 ເປີດສຽງແລ້ວ'; this.disabled=true; this.style.opacity=.6;
+  };
+
+  els('cancelBtn').onclick= async function(){
+    if(!confirm('ຕ້ອງການຍົກເລີກຄິວ '+myTicket+' ບໍ?')) return;
+    try{ await LAOFE_API.cancel(myTicket); }catch(e){}
+    clearTicket(); stop();
+    els('viewTicket').classList.add('hide');
+    els('viewBook').classList.remove('hide');
+    els('name').value=''; els('phone').value=''; people=1; renderPeople();
+  };
+
+  // ---- ເປີດຫາຄິວເກົ່າ (ຖ້າມີ) ----
+  var existing = loadTicket();
+  if(existing){
+    myTicket = existing;
+    els('viewBook').classList.add('hide');
+    els('viewTicket').classList.remove('hide');
+    els('myTicket').textContent = myTicket;
+    makeQR();
+    poll();
+  }
+
+  // ເຕືອນຖ້າຍັງບໍ່ຕັ້ງຄ່າ
+  if(!(window.LAOFE_API && LAOFE_API.configured())){
+    showErr('bookErr','⚠️ ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ API_URL ໃນ config.js — ເບິ່ງຄູ່ມືຕິດຕັ້ງ');
+  }
+})();
+</script>
+</body>
+</html>
