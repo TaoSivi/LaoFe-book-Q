@@ -14,17 +14,19 @@
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body: JSON.stringify(payload),
-      redirect: 'follow'
+      redirect: 'follow',
+      cache: 'no-store'
     });
     return res.json();
   }
 
   async function get(params) {
     if (!configured()) throw new Error('ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ API_URL ໃນ config.js');
+    params._t = String(Date.now());   // ກັນ browser cache ຄ່າເກົ່າ
     var q = Object.keys(params).map(function (k) {
       return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
     }).join('&');
-    var res = await fetch(URL + '?' + q, { method: 'GET', redirect: 'follow' });
+    var res = await fetch(URL + '?' + q, { method: 'GET', redirect: 'follow', cache: 'no-store' });
     return res.json();
   }
 
