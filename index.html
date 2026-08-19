@@ -255,7 +255,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       if(!r||!r.ok) throw new Error((r&&r.error)||'error');
       saveTicket(r.ticket);
       els('cancelBtn').classList.remove('hide');
-      openTicket(r.ticket, true, r);   // ຕື່ມເລກຄິວ + QR + ນັບຖອຍຫຼັງ
+      openTicket(r.ticket, true);   // ຕື່ມເລກຄິວ + QR ທັນທີ; poll ຈະຕື່ມສະຖານະ
     }catch(err){
       els('viewTicket').classList.add('hide'); els('myTicket').textContent='—'; els('cancelBtn').classList.remove('hide');
       showBook(); showErr('bookErr','Error: '+err.message);
@@ -268,7 +268,9 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     els('viewHome').classList.add('hide');
     els('viewBook').classList.add('hide');
     els('viewTicket').classList.remove('hide');
-    els('myTicket').textContent=myTicket;
+    els('myTicket').textContent=myTicket;                 // ← ເລກຄິວຂຶ້ນທັນທີ
+    els('ringCap').textContent=t('waiting');
+    els('statusPill').innerHTML='<span class="pill wait">'+t('waiting')+'</span>';
     // QR: ສະແດງສະເພາະ kiosk (ຫຼັງຈອງ); ຝັ່ງລູກຄ້າທີ່ສະແກນເຂົ້າແລ້ວ = ເຊື່ອງ
     if(kiosk){ els('qrWrap').classList.remove('hide'); makeQR(); }
     else { els('qrWrap').classList.add('hide'); }
