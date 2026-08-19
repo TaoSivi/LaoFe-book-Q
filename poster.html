@@ -54,7 +54,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 <script src="config.js"></script>
 <script>
 (function(){
-  var link = location.origin + location.pathname.replace(/poster\.html$/,'index.html');
+  var link = location.origin + location.pathname.replace(/poster\.html$/,'queue.html');
   if(link.endsWith('/')) link += 'index.html';
   document.getElementById('link').textContent = link;
   try{ new QRCode(document.getElementById('qr'),{text:link,width:230,height:230,colorDark:'#4A1020',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M}); }
