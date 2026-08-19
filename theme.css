@@ -22,6 +22,15 @@
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
+/* ກົດແລ້ວໄປທັນທີ: ລຶບ 300ms tap-delay + ແສງກົດ + smooth scroll */
+html{scroll-behavior:smooth}
+button,.btn,.mini,a.btn,.langsw button,.stepper button,.chip,select,label,.qcard{
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+button,.btn,.mini,.langsw button,.stepper button{ user-select:none; -webkit-user-select:none; }
+#list,#histList{ -webkit-overflow-scrolling:touch; }
+.mini:active{ transform:scale(.94); }
+.mini{ transition:transform .1s, background .15s, border-color .15s; }
 body{
   font-family:var(--font);
   line-height:1.65;
