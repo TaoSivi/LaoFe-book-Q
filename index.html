@@ -127,7 +127,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
 <script>
 (function(){
   var C = window.LAOFE_CONFIG || {};
-  var POLL = Math.min(parseInt(C.POLL_MS,10)||2500, 2500);  // ໄວສຸດ ~2.5 ວິ
+  var POLL = Math.min(parseInt(C.POLL_MS,10)||2000, 2000);  // ໄວສຸດ ~2 ວິ
   var els = function(id){return document.getElementById(id);};
   var storeKey = 'laofe_ticket';
 
@@ -147,7 +147,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       booking:'ກຳລັງຈອງ...', issuing:'ກຳລັງອອກເລກຄິວ...', err_name:'ກະລຸນາໃສ່ຊື່', err_phone:'ກະລຸນາໃສ່ເບີໂທໃຫ້ຖືກຕ້ອງ',
       you_next:'ທ່ານແມ່ນຄິວຕໍ່ໄປ', n_more:'ອີກ {n} ຄິວ', skipped:'ຄິວຖືກຂ້າມ ກະລຸນາຕິດຕໍ່ພະນັກງານ',
       cancelled:'ຍົກເລີກແລ້ວ', notfound:'ບໍ່ພົບຄິວນີ້', confirm_cancel:'ຕ້ອງການຍົກເລີກຄິວ',
-      err_cfg:'⚠️ ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ API_URL — ເບິ່ງຄູ່ມືຕິດຕັ້ງ', label_serving:'ກຳລັງຮັບໃຊ້', label_mine:'ຄິວຂອງທ່ານ', live_hint:'ອັບເດດສົດທຸກ 5 ວິ' },
+      err_cfg:'⚠️ ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ API_URL — ເບິ່ງຄູ່ມືຕິດຕັ້ງ', label_serving:'ກຳລັງຮັບໃຊ້', label_mine:'ຄິວຂອງທ່ານ', live_hint:'ອັບເດດສົດອັດຕະໂນມັດ' },
     en:{ home_title:'Current Queue', now_serving:'Now serving', total_waiting:'Total waiting',
       no_queue:'No queue yet', book_cta:'Book a Queue', book_title:'Book a Queue', label_name:'Name', ph_name:'Your name',
       label_phone:'Phone', label_people:'People', btn_book:'Confirm Booking', back:'Back',
@@ -162,7 +162,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       booking:'Booking...', issuing:'Issuing your number...', err_name:'Please enter your name', err_phone:'Please enter a valid phone',
       you_next:"You're next", n_more:'{n} ahead', skipped:'Queue skipped, please contact staff',
       cancelled:'Cancelled', notfound:'Queue not found', confirm_cancel:'Cancel queue',
-      err_cfg:'⚠️ API_URL not set — see setup guide', label_serving:'Serving', label_mine:'You', live_hint:'Live · updates every 5s' },
+      err_cfg:'⚠️ API_URL not set — see setup guide', label_serving:'Serving', label_mine:'You', live_hint:'Live · auto-updating' },
     th:{ home_title:'คิวปัจจุบัน', now_serving:'กำลังให้บริการ', total_waiting:'คิวที่รอทั้งหมด',
       no_queue:'ยังไม่มีคิว', book_cta:'จองคิว', book_title:'จองคิว', label_name:'ชื่อ', ph_name:'ชื่อของคุณ',
       label_phone:'เบอร์โทร', label_people:'จำนวนคน', btn_book:'ยืนยันจองคิว', back:'กลับ',
@@ -177,7 +177,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       booking:'กำลังจอง...', issuing:'กำลังออกหมายเลขคิว...', err_name:'กรุณากรอกชื่อ', err_phone:'กรุณากรอกเบอร์ให้ถูกต้อง',
       you_next:'คุณคือคิวถัดไป', n_more:'อีก {n} คิว', skipped:'คิวถูกข้าม กรุณาติดต่อพนักงาน',
       cancelled:'ยกเลิกแล้ว', notfound:'ไม่พบคิวนี้', confirm_cancel:'ต้องการยกเลิกคิว',
-      err_cfg:'⚠️ ยังไม่ได้ตั้งค่า API_URL — ดูคู่มือติดตั้ง', label_serving:'ให้บริการ', label_mine:'คุณ', live_hint:'อัปเดตสดทุก 5 วิ' }
+      err_cfg:'⚠️ ยังไม่ได้ตั้งค่า API_URL — ดูคู่มือติดตั้ง', label_serving:'ให้บริการ', label_mine:'คุณ', live_hint:'อัปเดตสดอัตโนมัติ' }
   };
   var lang = 'la';
   try{ lang = localStorage.getItem('laofe_lang') || 'la'; }catch(e){}
