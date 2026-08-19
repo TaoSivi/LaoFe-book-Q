@@ -37,6 +37,7 @@
     board: function () { return get({ action: 'board' }); },
     cancel: function (ticket) { return post({ action: 'cancel', ticket: ticket }); },
     list: function (pin) { return get({ action: 'list', pin: pin }); },
+    history: function (pin, date) { return get({ action: 'history', pin: pin, date: date || '' }); },
     call: function (pin, ticket) { return post({ action: 'call', pin: pin, ticket: ticket }); },
     next: function (pin) { return post({ action: 'next', pin: pin }); },
     done: function (pin, ticket) { return post({ action: 'done', pin: pin, ticket: ticket }); },
